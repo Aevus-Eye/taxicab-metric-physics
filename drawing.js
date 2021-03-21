@@ -1,3 +1,5 @@
+let storeLast = false;
+
 function drawTcCircle(x, y, r) {
   noFill()
   beginShape()
@@ -65,18 +67,22 @@ function drawRotated(v, center, angle, realvertexcount) {
       v: p.v
     }
   });
-  if(sliders[4].value()>0.9)
-    rotatedShape=nv;
 
-  let ti=earcut(spreadcoords(nv));
-  let a=0;
-  for(let i=0;i<ti.length;i+=3)
-    a+=trianglearea(nv[ti[i]],nv[ti[i+1]],nv[ti[i+2]]);
+  let storeNow = sliders[4].value() > 0.9;
+  if (storeNow && !storeLast) {
+    rotatedShape = nv;
+  }
+  storeLast = storeNow;
+
+  let ti = earcut(spreadcoords(nv));
+  let a = 0;
+  for (let i = 0; i < ti.length; i += 3)
+    a += trianglearea(nv[ti[i]], nv[ti[i + 1]], nv[ti[i + 2]]);
   textSize(20)
   stroke(255)
-  fill(0,255,100)
+  fill(0, 255, 100)
   //text(a.toFixed(3),0,0)
-  text(a.toFixed(2).padStart(8,'0'),-width/2,height/2)
+  text(a.toFixed(2).padStart(8, '0'), -width / 2, height / 2)
   noFill()
 
   stroke(0)
@@ -135,7 +141,7 @@ function drawRotated(v, center, angle, realvertexcount) {
 
 
   for (let i = 0; i < realvertexcount; i++) {
-    let index = nv.length / realvertexcount * i;
+    let index = floor(nv.length / realvertexcount * i);
     stroke(255, 0, 0)
     circle(nv[index].x, nv[index].y, 3);
     //stroke(0, 255, 0, 30)

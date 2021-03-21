@@ -47,27 +47,37 @@ class Shape {
   }
 
   rotate(center, angle) {
-
+    //refrence, how i did it before with the subdivided mesh
+    /*
+    let nv = v.map(p => {
+      //convert a point into polar, add the angle, then change back into cartesian
+      let a = tcatan2(p.x - center.x, p.y - center.y) + angle;
+      let r = tcdist(center.x, center.y, p.x, p.y);
+      return {
+        x: tccos(a) * r + center.x,
+        y: tcsin(a) * r + center.y,
+        u: p.u,
+        v: p.v
+      }
+    });
+    */
+    
   }
 
   draw() {
-    let tris = this.createTris();
-    let trisl = tris.length;
-    //print(tris)
-
     if (!this.tex) {
-      stroke(255)
-      for (var i = 0; i < trisl; i += 3) {
-        beginShape();
-        let v = this.v[tris[i]];
-        vertex(v.x, v.y, 0, v.u, v.v);
-        v = this.v[tris[i + 1]];
-        vertex(v.x, v.y, 0, v.u, v.v);
-        v = this.v[tris[i + 2]];
-        vertex(v.x, v.y, 0, v.u, v.v);
-        endShape(CLOSE);
+      stroke(this.col ?? 255)
+      strokeWeight(1);
+      let el = this.e.length;
+      for (var i = 0; i < el; i += 2) {
+        let v1 = this.v[this.e[i]];
+        let v2 = this.v[this.e[i + 1]];
+        line(v1.x, v1.y, v2.x, v2.y);
       }
     } else {
+      let tris = this.createTris();
+      let trisl = tris.length;
+      
       texture(this.tex)
       beginShape(TRIANGLES)
       for (var i = 0; i < trisl; i++) {

@@ -115,10 +115,10 @@ function draw() {
 			}
 		]
 	]
-	let square=new Shape(shape[0],[0,1, 1,2, 2,3, 3,0, 1,3],img);
+	//let square=new Shape(shape[0],[0,1, 1,2, 2,3, 3,0, 1,3],img);
 	//print(square)
-	square.draw();
-	/*
+	//square.draw();
+	
   let subdivamount = 70;
   shape = subdivshape(shape[floor(sliders[3].value() * 4)], subdivamount);
   //shape=[]
@@ -128,7 +128,7 @@ function draw() {
     x: sliders[0].value() * 100 - 50,
     y: sliders[1].value() * 100 - 50
   }, sliders[2].value() * 8, shape.length / subdivamount);
-  */
+  
 }
 
 
