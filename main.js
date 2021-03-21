@@ -1,6 +1,9 @@
 //import {earcut} from "earcut.js"
 
-// try a euclidean circle
+/* todo: 
+  try a euclidean circle
+  every shape has to be triangulated before getting rotated. then, every time the rotational center changes, 4 cuts are made. when the rot center changes, the previous cuts are saved, and the new cuts are overlayed. this way you end up with.
+*/
 let sliders = [];
 let buttons = [];
 let img;
@@ -17,6 +20,7 @@ function setup() {
 
   let size = min(windowWidth, windowHeight);
   createCanvas(size, size, WEBGL);
+  print(size)
   background(100);
   for (let i = 0; i < 5; i++) {
     sliders.push(createSlider(0, 0.9999, 0, 0));
@@ -111,6 +115,10 @@ function draw() {
 			}
 		]
 	]
+	let square=new Shape(shape[0],[0,1, 1,2, 2,3, 3,0, 1,3],img);
+	//print(square)
+	square.draw();
+	/*
   let subdivamount = 70;
   shape = subdivshape(shape[floor(sliders[3].value() * 4)], subdivamount);
   //shape=[]
@@ -120,6 +128,7 @@ function draw() {
     x: sliders[0].value() * 100 - 50,
     y: sliders[1].value() * 100 - 50
   }, sliders[2].value() * 8, shape.length / subdivamount);
+  */
 }
 
 
