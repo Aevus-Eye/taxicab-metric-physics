@@ -71,6 +71,7 @@ function drawRotated(v, center, angle, realvertexcount) {
   let storeNow = sliders[4].value() > 0.9;
   if (storeNow && !storeLast) {
     rotatedShape = nv;
+    sliders[2].value(0);
   }
   storeLast = storeNow;
 
