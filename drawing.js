@@ -54,19 +54,9 @@ function drawTcCircle(x, y, r) {
   circle(center.x, center.y, 3);
 }*/
 
-function drawRotated(v, center, angle, realvertexcount) {
-  //print(angle)
-  let nv = v.map(p => {
-    //convert a point into polar, add the angle, then change back into cartesian
-    let a = tcatan2(p.x - center.x, p.y - center.y) + angle;
-    let r = tcdist(center.x, center.y, p.x, p.y);
-    return {
-      x: tccos(a) * r + center.x,
-      y: tcsin(a) * r + center.y,
-      u: p.u,
-      v: p.v
-    }
-  });
+function drawRotated(v, center, angle, original) {
+  //splitRotLineSeg(original[0],original[1],center,angle)
+  let nv = v.map(p=>tcrotate(p,center,angle));
 
   let storeNow = sliders[4].value() > 0.9;
   if (storeNow && !storeLast) {
@@ -75,7 +65,8 @@ function drawRotated(v, center, angle, realvertexcount) {
   }
   storeLast = storeNow;
 
-  let ti = earcut(spreadcoords(nv));
+  //calculate area
+  /*let ti = earcut(spreadcoords(nv));
   let a = 0;
   for (let i = 0; i < ti.length; i += 3)
     a += trianglearea(nv[ti[i]], nv[ti[i + 1]], nv[ti[i + 2]]);
@@ -84,7 +75,17 @@ function drawRotated(v, center, angle, realvertexcount) {
   fill(0, 255, 100)
   //text(a.toFixed(3),0,0)
   text(a.toFixed(2).padStart(8, '0'), -width / 2, height / 2)
-  noFill()
+  noFill()*/
+  //calculate length
+  /*
+  let len = nv.reduce((prev, cur) => { let l = tcdistp(prev, cur); return { d: (prev.d || 0) + l, ...cur } }, nv[nv.length - 1]).d;
+
+  textSize(20)
+  stroke(255)
+  fill(0, 255, 100)
+  //text(a.toFixed(3),0,0)
+  text(len.toFixed(2).padStart(8, '0'), -width / 2, height / 2)
+  noFill()*/
 
   stroke(0)
   let r = 150;
@@ -141,11 +142,56 @@ function drawRotated(v, center, angle, realvertexcount) {
   strokeWeight(1)
 
 
-  for (let i = 0; i < realvertexcount; i++) {
-    let index = floor(nv.length / realvertexcount * i);
+  let li = floor(nv.length / original.length * (original.length - 1))
+  for (let i = 0; i < original.length; i++) {
+    let index = floor(nv.length / original.length * i);
     stroke(255, 0, 0)
     circle(nv[index].x, nv[index].y, 3);
+    stroke(30, 30, 200)
+    line(nv[index].x, nv[index].y, nv[li].x, nv[li].y);
+    li = index;
+
+
     //stroke(0, 255, 0, 30)
     //drawTcCircle(center.x, center.y, tcdistp(nv[index], center))
   }
+  
+  drawRotated2(original,center,angle)
+}
+
+//vertecies, center, angle
+function drawRotated2(v,c,a){
+  let ps=splitRotLineSeg(v[0],v[1],c,a).map(p=>lerpp(v[0],v[1],p));
+  ps=[v[0],...ps,v[1]]
+  stroke(250,250,20);
+  for (let i = 0; i < ps.length; i++) {
+    circle(ps[i].x,ps[i].y,3);
+  }
+  let nv = ps.map(p => tcrotate(p,c,a));
+  stroke(20,250,250);
+  for (let i = 0; i < ps.length; i++) {
+    circle(nv[i].x, nv[i].y,3);
+  }
+}
+
+//splits a line segment, so that it can easyle be rotated. 
+function splitRotLineSeg(p1,p2,c,a){
+  return [...new Set([0,-a,2,2-a].flatMap(x=>{
+    let res=doLineSegmentLineIntersection(p1,p2,c,x);
+    return res.intersect?[res.t]:[];
+  }))].sort();
+  /*textSize(20)
+  stroke(255)
+  fill(0, 255, 100)
+  //text(a.toFixed(3),0,0)
+  text(ps.reduce((prev,cur)=>prev+cur.toFixed(2)+", ","l:"+ps.length+"  "), -width / 2, height / 2)
+  noFill()
+  //print(ps)*/
+}
+
+function drawAngle(p, angle, r = 20) {
+  push()
+  stroke(20, 200, 200)
+  line(p.x, p.y, p.x + tccos(angle) * r, p.y + tcsin(angle) * r);
+  pop()
 }

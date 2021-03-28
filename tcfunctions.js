@@ -53,7 +53,14 @@ function tclength(x, y) {
   return abs(x) + abs(y)
 }
 
-/*
-function tctriarea(v) {
-  return trianglearea(...v);
-}*/
+function tcrotate(p,center,angle) {
+  //convert a point into polar, add the angle, then change back into cartesian
+  let a = tcatan2(p.x - center.x, p.y - center.y) + angle;
+  let r = tcdist(center.x, center.y, p.x, p.y);
+  return {
+    x: tccos(a) * r + center.x,
+    y: tcsin(a) * r + center.y,
+    u: p.u,
+    v: p.v
+  }
+}
