@@ -7,7 +7,7 @@ function signedTriArea(a,b,c){
 }
 
 function triCentroid(a,b,c){
-  return {x:(a.x+b.x+c.x)/3,y:(a.y+b.y+c.y)/3};
+  return cvec((a.x+b.x+c.x)/3,(a.y+b.y+c.y)/3);
 }
 
 function copyToClipboard(text) {

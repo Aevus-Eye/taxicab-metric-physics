@@ -1,4 +1,4 @@
-//import {earcut} from "earcut.js"
+//checkout this https://www.codeproject.com/Articles/1029858/Making-a-D-Physics-Engine-The-Math
 
 /* todo: 
   try a euclidean circle
@@ -18,12 +18,13 @@ let img;
 let rotatedShape;
 let font;
 let frame=-1;
+/*
 let engine;
 var Engine = Matter.Engine,
     Render = Matter.Render,
     World = Matter.World,
     Bodies = Matter.Bodies;
-var decomp = require ( 'poly-decomp' );
+var decomp = require ( 'poly-decomp' );*/
 
 function preload() {
   img = loadImage('assets/20210206_152619.jpg');
@@ -73,7 +74,7 @@ function setup() {
   
   
   
-  
+  /*
   // create an engine
   engine = Engine.create();
   
@@ -97,6 +98,7 @@ function setup() {
   
   // run the renderer
   //Render.run(render);
+  */
 }
 
 function draw() {
@@ -271,7 +273,7 @@ storeLast = storeNow;
     y: sliders[1].value() * 100 - 50
   }, sliders[2].value() * 8, original);
 */
-  renderBox2d();
+  //renderBox2d();
 }
 
 function writeText(x,y,text_){

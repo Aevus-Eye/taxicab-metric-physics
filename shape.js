@@ -176,41 +176,63 @@ class Shape {
   constructor(v, col) {
     this.v = v; //[{x,y,u,v}, ...]
     this.col = col ?? 255;
-    [this.centerOfMass, this.area] = this.calculateCentroidAndArea();
-    this.lastRotCenter = undefined;
+    this.centerOfMass;
+    this.area;
+    this.calculateCentroidAndArea();
+
+    this.lastRotCenterAttempt=cvec(0,0); // only for debug visualizations, useless otherwise.
+    this.lastRotCenter = cvec(0,0);
     this.lastRotAngle = 0;
-    
-    this.vel={x:0,y:0}
-    this.angVel=0;
+    this.lastV= this.v.map(x => x.clone());
+
+    this.vel = cvec(0, 0)
+    this.angVel = 0;
   }
 
   rotate(center, angle) {
+    this.lastRotCenterAttempt=center;
+    if (angle === 0)
+      return;
     // dont split the shape if the rotation center is the same.
-    if (!(center.x === this.lastRotCenter.x && center.y === this.lastRotCenter.y)) {
-      let nv = []
-      let last = this.v[this.v.length - 1];
-      for (var p of this.v) {
-        let s = splitRotLineSeg(last, p, center, angle).map(t => lerpp(last, p, t));
-        nv.push(...s, p);
-        last = p
-      }
-      this.v = nv;
-      this.lastRotCenter = center;
+    let samecenter=tcdistp(center,this.lastRotCenter)<=0.15;
+    if(/*!center.equals(this.lastRotCenter)*/!samecenter) {
+      this.lastV = this.v.map(x => x.clone());
+      this.lastRotAngle=0;
     }
+    let v=this.lastV;
+    angle=this.lastRotAngle+=angle;
 
+    let nv = []
+    let last = v[v.length - 1];
+    for (var p of v) {
+      let s = splitRotLineSeg(last, p, center, angle).map(t => lerpp(last, p, t));
+      nv.push(...s, p);
+      last = p
+    }
+    //print(this.v,nv)
+
+    this.lastRotCenter = center;
     //print("before",this.v,"after", nv)
-    this.v = this.v.map(p => tcrotate(p, center, angle))
+    this.v = nv.map(p => tcrotate(p, center, angle))//.filter((e,i,a)=>tcdistp(e,a[(i+1)%a.length])>0.2)
+    //print(this.v)
+    this.calculateCentroidAndArea();
+  }
+
+  applyForce(p, dir, amount) {
+    throw "not yet implemented"
+    let dif = this.centerOfMass.copy().sub(p).tcnormalize()
+    dif.dot()
   }
 
   //debug level either 0,1,2,3. 
   draw(debugLevel = 0) {
     strokeWeight(1);
     //draw the rotation lines
-    if (debugLevel >= 3 && this.lastRotCenter !== undefined) {
+    if (debugLevel >= 3 /* && this.lastRotCenter !== undefined*/) {
       stroke(0)
       let r = 150;
       let angle = this.lastRotAngle;
-      let c = this.lastRotCenter;
+      let c = this.lastRotCenterAttempt;
       line(c.x - r, c.y,
         c.x + r, c.y)
       line(c.x, c.y - r,
@@ -230,7 +252,8 @@ class Shape {
     //draw the actual polygon
     stroke(this.col)
     beginShape();
-    for (var p of this.v) {
+    //print(this.v)
+    for (let p of this.v) {
       vertex(p.x, p.y);
     }
     endShape(CLOSE);
@@ -238,7 +261,7 @@ class Shape {
     //draw the vertecies with extra red circles
     if (debugLevel >= 1) {
       stroke(255, 0, 0)
-      for (var i = 0; i < this.v.length; i++) {
+      for (let i = 0; i < this.v.length; i++) {
         circle(this.v[i].x, this.v[i].y, 3)
       }
     }
@@ -257,15 +280,36 @@ class Shape {
 
   calculateCentroidAndArea() {
     let area = 0;
-    let centroid = { x: 0, y: 0 };
+    let centroid = cvec(0, 0);
     let fixed = this.v[this.v.length - 1]
     for (let i = 0; i < this.v.length - 2; i++) {
       let a = signedTriArea(this.v[i], this.v[i + 1], fixed);
       let c = triCentroid(this.v[i], this.v[i + 1], fixed);
+      //centroid.add()
       centroid.x += c.x * a;
       centroid.y += c.y * a;
       area += a;
     }
-    return [{ x: centroid.x / area, y: centroid.y / area }, abs(area)];
+
+    this.centerOfMass = cvec(centroid.x, centroid.y).div(area);
+    this.area = abs(area)
+  }
+  
+  calculateCentroidAndArea2(){
+    
+     let area = 0;
+     let centroid = cvec(0, 0);
+     let fixed = this.v[this.v.length - 1]
+     for (let i = 0; i < this.v.length - 2; i++) {
+       let a = signedTriArea(this.v[i], this.v[i + 1], fixed);
+       let c = triCentroid(this.v[i], this.v[i + 1], fixed);
+       //centroid.add()
+       centroid.x += c.x * a;
+       centroid.y += c.y * a;
+       area += a;
+     }
+    
+     this.centerOfMass = cvec(centroid.x, centroid.y).div(area);
+     this.area = abs(area)
   }
 }

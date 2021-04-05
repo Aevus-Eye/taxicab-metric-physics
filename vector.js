@@ -7,13 +7,17 @@ Hacked from evanw's lightgl.js
 https://github.com/evanw/lightgl.js/blob/master/src/vector.js
 
 */
-
+//todo:
+// change every vector method so it returns a new vector, and have an extra method with prefix "s" to make it act on itself. 
+// also add a generic apply and sapply for any function to all 2 members
 function Vector(x, y) {
-	this.x = x || 0;
-	this.y = y || 0;
+	this.x = x ?? 0;
+	this.y = y ?? 0;
 }
 //alias
-let cvec=Vector;
+function cvec(){
+  return new Vector(...arguments);
+}
 
 /* INSTANCE METHODS */
 
@@ -66,7 +70,7 @@ Vector.prototype = {
 		return this;
 	},
 	equals: function(v) {
-		return this.x == v.x && this.y == v.y;
+		return this.x === v.x && this.y === v.y;
 	},
 	dot: function(v) {
 		return this.x * v.x + this.y * v.y;
@@ -77,7 +81,9 @@ Vector.prototype = {
 	length: function() {
 		return Math.sqrt(this.dot(this));
 	},
-	tclength: tclength.bind(undefined,this),
+	tclength: function() {
+	  return tclength(this);
+	},
 	normalize: function() {
 		return this.div(this.length());
 	},
@@ -129,7 +135,7 @@ Vector.div = function(a, b) {
 	else return new Vector(a.x / b, a.y / b);
 };
 Vector.equals = function(a, b) {
-	return a.x == b.x && a.y == b.y;
+	return a.x === b.x && a.y === b.y;
 };
 Vector.dot = function(a, b) {
 	return a.x * b.x + a.y * b.y;
